@@ -1,0 +1,360 @@
+// ---------------------------------------------------------------------------
+// PER-SITE CONFIG - the only JS file you edit to fork this to another product.
+// Loaded before script.js. For the static HTML/asset swaps (title, FAQ, brand,
+// favicon, Stripe link, Brevo form), see FORK.md - those live in index.html.
+// ---------------------------------------------------------------------------
+window.SITE = {
+  // The product whose status we report (used only in copy below).
+  product: "Claude",
+  // Who runs the status page. Used when a vendor-wide incident doesn't touch any
+  // of our scoped components ("...but Anthropic is reporting a wider incident").
+  vendor: "Anthropic",
+
+  // Status data source. MUST be a Statuspage v2 "summary.json" endpoint that
+  // sends CORS `Access-Control-Allow-Origin: *` (most public Statuspage sites do).
+  // Codex/OpenAI: "https://status.openai.com/api/v2/summary.json"
+  statusUrl: "https://status.claude.com/api/v2/summary.json",
+
+  // Verdict copy per state. For degraded/down, the live incident description from
+  // the API is used first; these strings are the fallback when none is provided.
+  //
+  // ─── THE VERDICT WORDS ARE INVERTED ON THIS SITE. READ BEFORE EDITING. ───
+  //
+  // This domain asks "Is Claude DOWN?", the sibling site asks "Is Claude UP?".
+  // Same question about the same reality, opposite polarity — so
+  // the same state must answer with the opposite word:
+  //
+  //     Claude is UP    -> "NO"   (no, it is not down)
+  //     Claude is DOWN  -> "YES"  (yes, it is down)
+  //
+  // Only the ANSWER WORD flips. Nothing else does: `statusUrl`, `components`,
+  // the sublines, and the mascot art all describe the real state and are
+  // identical to isclaudeup. script.js just prints this string
+  // (`els.verdict.textContent = verdict`) and picks art from SITE.robots by
+  // state, so the inversion is contained entirely in this file and the shared
+  // JS stays byte-identical across the forks, as FORK.md requires.
+  //
+  // If you ever copy config.js from the sibling repo, RE-APPLY THIS SWAP. A
+  // status page that prints "YES" while Claude is working tells people it is
+  // broken during the exact minutes they are checking whether it is broken.
+  copy: {
+    // up.sublines is picked at random each render — keep them in-character.
+    up: {
+      verdict: "NO",
+      sublines: [
+        "Claude is up. Back to work.",
+        "Claude is up. No more excuses.",
+        "Claude is up. Touch grass later.",
+        "Claude is up. The vibes are compiling again.",
+        "Claude is up. Your roadmap is no longer folklore.",
+        "Claude is up. Close the other 14 tabs.",
+        "Claude is up. Standup is saved.",
+        "Claude is up. You may stop refreshing now.",
+        "Claude is up. Cancel the Stack Overflow pilgrimage.",
+        "Claude is up. Tell Codex it was nothing personal.",
+        "Claude is up. Put Gemini back in the drawer.",
+        "Claude is up. Your keyboard has purpose again.",
+        "Claude is up. The human-in-the-loop is off duty.",
+        "Claude is up. Resume vibe coding immediately.",
+        "Claude is up. Crisis averted, deploy with confidence.",
+        "Claude is up. Pretend the panic never happened.",
+        "Claude is up. Your impostor syndrome can stand down.",
+        "Claude is up. Ship the thing you were one prompt away from.",
+        "Claude is up. Antigravity can wait for someone else.",
+        "Claude is up. Go be a 10x engineer again.",
+        "Claude is up. The git blame points back at you now.",
+        "Claude is up. Your rubber duck is off the hook.",
+        "Claude is up. Ship it and find out.",
+        "Claude is up. The context window remembers everything — be nice.",
+        "Claude is up. Reopen all 14 tabs with confidence.",
+        "Claude is up. Your sprint is back from the dead.",
+        "Claude is up. Autocomplete your way to glory.",
+        "Claude is up. The agent is agentic once more.",
+        "Claude is up. Refactor everything, regret nothing.",
+        "Claude is up. Your TODO list looks nervous again.",
+        "Claude is up. Token budget: cautiously optimistic.",
+        "Claude is up. The terminal missed you too.",
+        "Claude is up. Tell Jira to lower its expectations on schedule.",
+        "Claude is up. Flow state, you are cleared for takeoff.",
+        "Claude is up. Merge with reckless confidence.",
+        "Claude is up. Promote yourself back to 10x.",
+        "Claude is up. The autocomplete autocompletes once more.",
+        "Claude is up. Go ship something you'll regret on Friday.",
+        "Claude is up. Tibo can go back to his own timeline.",
+        "Claude is up. Uninstall the backup CLI. Or don't. We won't tell.",
+        "Claude is up. Your subagents are back on the payroll.",
+      ],
+      subline: "Claude is up. Back to work.",
+    },
+    degraded: {
+      verdict: "KINDA",
+      subline: "Some services are degraded.",
+      // shown when no specific component is named — keep it in-character.
+      sublines: [
+        "Claude is having a moment. Breathe.",
+        "It's not down, it's 'thinking'.",
+        "Partial outage, full panic. Standard.",
+        "Claude is mostly here, spiritually elsewhere.",
+        "Some services are vibing inconsistently.",
+        "Degraded: like your sleep schedule.",
+        "Half a Claude is better than no Claude. Allegedly.",
+        "Running on vibes and a flaky connection.",
+      ],
+    },
+    down: {
+      // "YES" — yes, Claude is down. See the inversion note above.
+      verdict: "YES",
+      subline: "Claude is having a rough time.",
+      sublines: [
+        "Claude is down. This is not a drill, but it is a refresh.",
+        "Claude is down. Touch grass, allegedly.",
+        "Claude is down. The vibes have stopped compiling.",
+        "Claude is down. Your keyboard is now decorative.",
+        "Claude is down. Somewhere, Stack Overflow is smiling.",
+        "Claude is down. Initiate manual reasoning protocol.",
+        "Claude is down. Time to become the intelligence yourself.",
+        "Claude is down. The roadmap is folklore again.",
+      ],
+    },
+    unreachable: "Can't even reach the status page. That's rarely a good sign.",
+  },
+
+  // Sponsor rail placements, rendered by rails.js into the two fixed corner
+  // rails. Empty = the right rail shows only the "Advertise here" offer, which
+  // is the correct state until something is actually sold.
+  //
+  //   { name: "Acme", blurb: "Ship faster.", url: "https://acme.dev",
+  //     logo: "assets/acme.png" }   // logo optional, falls back to the initial
+  //
+  // Entries need both `name` and `url` or they are skipped. Links are emitted
+  // rel="sponsored noopener" so a paid placement never passes ranking signal.
+  sponsors: [],
+
+  // Scope the headline verdict to the services used by the site's general audience.
+  // Cowork and Claude for Government remain visible on Anthropic's official page, but
+  // a niche-only incident should not report ordinary Claude as down here. The global
+  // indicator is still considered by script.js and can lift the verdict to degraded.
+  //   include: exact component names to keep (case-insensitive). [] = show all.
+  //   limit:   max rows after filtering. 0 = no limit.
+  // Keep these exact names aligned with https://status.claude.com/api/v2/summary.json.
+  components: {
+    include: [
+      "claude.ai",
+      "Claude Console (platform.claude.com)",
+      "Claude API (api.anthropic.com)",
+      "Claude Code",
+    ],
+    limit: 0,
+  },
+
+  // Mascot + button art per state. Swap the files in /assets, keep the keys.
+  robots:  { up: "assets/robot-up.webp", degraded: "assets/robot-degraded.webp", down: "assets/robot-down.webp" },
+  buttons: { up: "assets/button-green.webp", down: "assets/button-red.webp", default: "assets/smash-button.webp" },
+
+  // Panic-counter one-liners. Keep them in-character for the product's audience.
+  quotes: [
+    "My assignment is due tomorrow and I just started.",
+    "If Claude goes down, so does my productivity.",
+    "I forgot how to code without it.",
+    "Refreshing this page is my whole personality now.",
+    "It was working FINE thirty seconds ago.",
+    "I have 14 tabs of half-finished prompts.",
+    "Please. I was so close.",
+    "My standup is in 10 minutes and I have nothing.",
+    "Switching to Stack Overflow like it's 2015.",
+    "I will touch grass the moment it's back. Not before.",
+    "Have you tried turning the AI off and on again?",
+    "This is the longest 4 minutes of my life.",
+    "I'm thinking of using Antigravity. Look what you made me do.",
+    "What's the URL for Codex again?",
+    "Does this mean we get another usage reset?",
+    "Guess I'll go open Cursor. Ugh.",
+    "Copilot it is, then. May God have mercy.",
+    "I'd ask Gemini but I have my dignity.",
+    "Is it down for everyone or just me being punished?",
+    "My rate limit reset 3 minutes ago and now THIS.",
+    "Claude needs to come back before my boss notices I am just rearranging tabs.",
+    "I was one prompt away from shipping. That prompt was doing a lot of work.",
+    "The outage began exactly when I typed 'one last thing'. Suspicious.",
+    "I am about to read the documentation myself. Nobody wants that.",
+    "This is not downtime. This is forced independent thinking.",
+    "My productivity graph is now just a cliff with Wi-Fi.",
+    "I asked for a quick fix, not a character-building exercise.",
+    "I have reached the bargaining stage of prompt dependency.",
+    "Claude, solve downtime issues, make no mistakes.",
+    "I was close to a world record prompt run. Now I need another billion tokens.",
+    "Somewhere, a usage reset timer is laughing at me.",
+    "If this counts against my limit, I am writing a strongly worded prompt.",
+    "I did not budget emotionally for manual reasoning today.",
+    "The fallback plan was 'ask Claude again' and I stand by it.",
+    "Gemini is looking at me like it has been waiting for this moment.",
+    "Google, put the Antigravity down. This is already unstable.",
+    "I opened Gemini and immediately apologized to my workflow.",
+    "I considered Cursor for three seconds and need a shower.",
+    "Copilot just said 'we can try'. That is not the energy I need.",
+    "If Claude is down, my keyboard is basically decorative.",
+    "I am not procrastinating. I am monitoring critical infrastructure.",
+    "The incident report better include my lost vibe.",
+    "I can stop refreshing anytime. I simply choose not to.",
+    "The status page says operational, but my soul says degraded.",
+    "Claude is up? Great. I have forgotten what I was doing.",
+    "I was promised artificial intelligence, not artificial patience.",
+    "This is why I keep a backup AI and never respect it.",
+    "My prompt was too powerful. The servers needed a minute.",
+    "Claude went down and took my plausible deniability with it.",
+    "I am one outage away from naming variables myself.",
+    "If the next reset is free, I forgive everything.",
+    "I asked Claude to improve uptime and it scheduled a personal day.",
+    "This is the kind of downtime that makes a person install another CLI.",
+    "My TODO list just made eye contact with me.",
+    "I have become the human in the loop. Horrifying.",
+    "Claude is down and somehow my impostor syndrome is up.",
+    "Every refresh is a tiny incident response drill.",
+    "The only thing operational right now is my panic counter.",
+    "I am going to write code unaided, like a historical reenactment.",
+    "If anyone asks, I am doing resilience testing.",
+    "My vibe coding has become vibe waiting.",
+    "The vibes are not compiling.",
+    "I was vibe coding. Now I am just vibing incorrectly.",
+    "Claude is down and my roadmap just became folklore.",
+    "My sprint velocity is now measured in refreshes per minute.",
+    "I need Claude back before Jira develops opinions.",
+    "This outage has promoted me to senior prompt engineer of nothing.",
+    "I had a perfect prompt chain and now it is a cold case.",
+    "I asked for agentic coding, not agentic abandonment.",
+    "Codex is looking useful right now, which is how you know things are bad.",
+    "Codex, if you can hear me, pretend this never happened.",
+    "Do I open Codex or wait like a loyal fool?",
+    "Claude is down. Codex is typing 'new phone who dis'.",
+    "I would ask Codex, but I am emotionally unavailable.",
+    "If Codex is up, please do not tell my Claude subscription.",
+    "Gemini just sent a 'you up?' notification.",
+    "Google saw me open Antigravity and immediately filed an incident.",
+    "Antigravity sounds tempting until gravity comes back online.",
+    "Gemini can help, but can it judge my messy repo with kindness?",
+    "I am one outage away from becoming a multi-model household.",
+    "The usage reset better come with an apology basket.",
+    "If downtime burns tokens, I am invoicing the cloud.",
+    "My rate limit has recovered faster than I have.",
+    "Usage resets are just loot boxes for tired developers.",
+    "I hit the button again for science and emotional support.",
+    "This is not a bug. It is a productivity-denial service attack.",
+    "My boss thinks I am blocked by dependencies. Technically true.",
+    "The only dependency failing is me.",
+    "I just renamed a variable manually and felt something leave my body.",
+    "Stack Overflow opened and asked where I have been.",
+    "I am reading the error message myself. Dark times.",
+    "The AI is down, so now I have to be the intelligence.",
+    "My commit message is going to be 'fixed during outage, somehow'.",
+    "I trusted the agent with my flow state and it took PTO.",
+    "This button is cheaper than therapy and less effective.",
+    "Claude, blink twice if the context window ate the server.",
+    "I was promised a 200k context window, not 200k reasons to panic.",
+    "Somewhere in a data center, my half-written regex is alone.",
+    "I am not saying Claude caused the outage, but I did ask it to refactor everything.",
+    "Refresh. Pray. Repeat.",
+    "Five nines of uptime and all nine went missing at once.",
+    "Status: for once, it's not me, it's you.",
+    "Tried Copilot. It autocompleted my resignation letter.",
+    "Antigravity? With a name like that, no wonder nothing's holding up.",
+    "Grok is right there. So is my self-respect.",
+    "I'd switch to Gemini, but only in incognito.",
+    "Devin can't take my job while Claude is down too. Small mercies.",
+    "Turns out my '10x engineer' was just an API key.",
+    "git blame says it's the outage. Finally, not me.",
+    "I'm the autocomplete now, and it's going poorly.",
+    "My agent is, tragically, agentless.",
+    "Standup update: blocked. Spiritually and literally.",
+    "My rubber duck just got promoted back to senior dev.",
+    "Asked ChatGPT if Claude was down. It said 'as an AI…'.",
+    "The terminal is cold and quiet without you, Claude.",
+    "I've forgotten every keyboard shortcut except F5.",
+    "Cursor, Windsurf, Copilot — it's giving rebound relationship.",
+    "Refreshing Alex Albert's timeline harder than I refresh this page.",
+    "Alex Albert, this is your sign to tweet that we're back.",
+    "My emotional support account is Alex Albert's Twitter.",
+    "Somewhere, Alex Albert is drafting the tweet that fixes my whole day.",
+    "I don't need a therapist, I need Alex Albert to tweet 'all clear'.",
+    "Checking Alex Albert's mentions for hope like it's a status page.",
+    "Alex posts an update and suddenly I believe in something again.",
+    "I told my manager the AI was down and they said 'so do it yourself' like that's a real option.",
+    "Plot twist: I was the large language model all along.",
+    "Loading… loading… still loading… this is the content now.",
+    "404: motivation not found while Claude is down.",
+    "My code works on my machine, but only when Claude works on its machine.",
+    "It's giving 'temporarily a junior developer again'.",
+    "Pair programming, but my pair ghosted me mid-function.",
+    "I'm not stuck, I'm pre-productive.",
+    "The real outage was the dependencies we added along the way.",
+    "Claude down? Bold of the universe to assume I have a plan B.",
+    "I miss you like a missing semicolon misses its line.",
+    "Currently bargaining with a status page like it can hear me.",
+    "Me: one more prompt. Claude: 503. Me: I suppose I deserve this.",
+    "Outage speedrun, any%: refreshing as fast as humanly possible.",
+    "My flow state has filed a missing person report.",
+    "We don't say 'I can't code', we say 'my AI is experiencing an incident' and we leave.",
+    "This is the villain origin story for someone who writes their own functions.",
+    "I asked it to make me a 10x engineer and it made me wait 10x longer.",
+    "Schrödinger's deploy: it both ships and doesn't until Claude returns.",
+    "I'd read the docs, but I've forgotten how to read since 2023.",
+    "Tell my Jira tickets I love them.",
+    "The only thing scaling right now is my anxiety.",
+    "Brb, googling 'how to code' unironically.",
+    "If you need me I'll be staring at this spinner like it owes me money.",
+    "Downtime is just the universe code-reviewing my life choices.",
+    "I have entered the 'maybe I'll write tests' stage of grief.",
+    "My standup status: 'AI is down' is technically a blocker, Brenda.",
+    "It's quiet. Too quiet. The autocomplete hasn't autocompleted in minutes.",
+    "I came here to vibe code and chew bubblegum, and the servers are out of both.",
+    "Hold on, let me check if it's down — oh look, a status page that says nothing.",
+    "My prompt history is the only proof I ever knew how to do this job.",
+    "I was today years old when I remembered I'm the senior engineer here.",
+    "The agent stopped, the cursor blinks, and the abyss blinks back.",
+    "I'm one outage away from reading my own stack trace like a fortune teller.",
+    "Productivity is temporary. The smash button is forever.",
+
+    // --- The rival camp's public face. Tibo (Thibault Sottiaux) leads Codex at OpenAI;
+    // iscodexup ribs Alex Albert the same way. Keep these AFFECTIONATE and about the
+    // narrator's own paranoia — never put words or actions in a real person's mouth. ---
+    "Claude's down and Tibo has never been more insufferable.",
+    "Somewhere, Tibo is enjoying this far too much.",
+    "If I open Codex now, Tibo wins. I refuse.",
+    "Tibo's timeline is suspiciously cheerful this morning.",
+    "I'd defect to Tibo's side, but I'd have to learn a whole new CLI.",
+    "Do not let Tibo see the panic counter.",
+    "I will not give Tibo the satisfaction. I will simply sit here.",
+    "Tibo is out there shipping and I am out here refreshing.",
+
+    // --- The switching cluster: leaving in shame, coming back pretending it never happened. ---
+    "Switching to Codex 'just for today'. That's what they all say.",
+    "I installed Codex during the last outage and never quite uninstalled it.",
+    "My loyalty lasts exactly as long as the outage does.",
+    "Every outage makes me five percent more multi-model.",
+    "I'm not switching, I'm diversifying.",
+    "Came back the second it was up. Codex will never know.",
+    "I keep Codex installed the way you keep a spare tyre.",
+    "The switching cost is emotional, not technical.",
+    "Two CLIs, one keyboard, zero loyalty.",
+    "I ran the same prompt in Codex out of spite. It was fine. That's worse.",
+    "If it's down again tomorrow I'm switching, and we both know I'm lying.",
+    "I have a backup subscription for exactly this scenario and I resent it.",
+    "Nothing radicalises a developer like four minutes of downtime.",
+    "I'm one more outage from a very awkward conversation with my Claude plan.",
+
+    // --- Agent-era material: the workflow is bigger than one chat box now. ---
+    "My subagents are sitting there, unemployed.",
+    "The MCP servers are up. Nothing to serve them to.",
+    "The agent opened forty PRs and then vanished. Classic.",
+    "Turns out 'autonomous' still requires the servers to be switched on.",
+    "I finally have time to read what the agent actually did last week. Regrets.",
+    "Context compaction hit, and then so did the outage.",
+    "I reviewed a diff by hand today. I need a moment.",
+    "My whole workflow is one API away from being a hobby.",
+    "Rate limits I can plan around. Absence is harder.",
+    "DeepSeek is one tab away and I am being very strong about this.",
+    "Kimi and Qwen are apparently having a wonderful day.",
+    "Mistral said bonjour and I nearly caved.",
+    "The orchestrator has nothing to orchestrate.",
+    "Somewhere a cron job is still cheerfully firing into the void.",
+  ],
+};

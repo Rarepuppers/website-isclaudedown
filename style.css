@@ -1,0 +1,831 @@
+:root {
+  --bg: #0f1115;
+  --fg: #f4f4f5;
+  --muted: #9aa0a6;
+  --card: #1a1d24;
+  --up: #16a34a;
+  --up-soft: #052e16;
+  --down: #dc2626;
+  --down-soft: #3f0d0d;
+  --warn: #d97706;
+  --warn-soft: #3a2606;
+  --radius: 18px;
+  --fg-soft: #cbd2da;
+  --line: #24272f;
+  --line-strong: #2c2f37;
+  --line-strongest: rgba(255, 255, 255, .34);
+  --overlay: rgba(255, 255, 255, .06);
+  --on-bright: #0f1115;
+}
+
+/* ---------------------------------------------------------------------------
+   Themes
+   ---------------------------------------------------------------------------
+   dark (default) → light → cream, cycled by theme.js and set on <html> before
+   first paint by an inline snippet in each page's <head>.
+
+   This page tints toward the verdict (see body[data-state] below), so the
+   "-soft" colours are not decoration — they ARE the page background during an
+   outage. Each theme therefore needs its own tint that stays readable: deep
+   near-blacks on dark, pale washes on the two light themes.
+
+   --on-bright is text that sits on a saturated badge (the green/red pills), so
+   it stays dark in every theme; the badge colour underneath does not change.
+--------------------------------------------------------------------------- */
+
+:root[data-theme="dark"] {
+  --bg: #0f1115;
+  --fg: #f4f4f5;
+  --muted: #9aa0a6;
+  --card: #1a1d24;
+  --fg-soft: #cbd2da;
+  --line: #24272f;
+  --line-strong: #2c2f37;
+  --line-strongest: rgba(255, 255, 255, .34);
+  --overlay: rgba(255, 255, 255, .06);
+  --on-bright: #0f1115;
+  --up: #16a34a;  --up-soft: #052e16;
+  --down: #dc2626; --down-soft: #3f0d0d;
+  --warn: #d97706; --warn-soft: #3a2606;
+}
+
+:root[data-theme="light"] {
+  --bg: #f4f8fd;
+  --fg: #16202c;
+  --muted: #5b6b7c;
+  --card: #ffffff;
+  --fg-soft: #445468;
+  --line: rgba(22, 32, 44, .12);
+  --line-strong: rgba(22, 32, 44, .2);
+  --line-strongest: rgba(22, 32, 44, .38);
+  --overlay: rgba(22, 32, 44, .05);
+  --on-bright: #ffffff;
+  --up: #15803d;  --up-soft: #d8f3e0;
+  --down: #b91c1c; --down-soft: #fbdcdc;
+  --warn: #b45309; --warn-soft: #fbeccd;
+}
+
+:root[data-theme="cream"] {
+  --bg: #f6efe4;
+  --fg: #201713;
+  --muted: #6a5b52;
+  --card: #fffdf8;
+  --fg-soft: #4c4039;
+  --line: rgba(32, 23, 19, .12);
+  --line-strong: rgba(32, 23, 19, .2);
+  --line-strongest: rgba(32, 23, 19, .38);
+  --overlay: rgba(32, 23, 19, .05);
+  --on-bright: #fffdf8;
+  --up: #1f8f77;  --up-soft: #ddefe9;
+  --down: #c0392b; --down-soft: #f8e2dd;
+  --warn: #b9481e; --warn-soft: #f7e6d5;
+}
+
+/* ---------- Top nav ----------------------------------------------------- */
+/* The site had no nav: history, badge and sponsor were reachable only from body
+   copy and the footer, which is why the outage-history page -- the one piece of
+   evergreen, indexable content here -- was effectively unlinked. */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* margin-left:auto rather than relying on the topbar's space-between: when the
+   header wraps on a narrow screen the nav becomes its own flex line, and
+   space-between then puts a lone item at flex-start. An auto margin keeps it
+   on the right in both states, so it does not jump sides at the wrap point. */
+.topbar nav { margin-left: auto; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.nav-links a {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.nav-links a:hover { color: var(--fg); background: var(--overlay); }
+.nav-links a[aria-current="page"] { color: var(--fg); background: var(--overlay); }
+.nav-links a:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+/* ---------- Theme toggle ------------------------------------------------ */
+
+.theme-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--card);
+  color: var(--fg);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.theme-toggle:hover { border-color: var(--line-strongest); transform: rotate(-12deg); }
+.theme-toggle:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+.nav-theme-item { display: flex; align-items: center; margin-left: 2px; }
+
+.theme-toggle--floating {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 60;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle { transition: none; }
+  .theme-toggle:hover { transform: none; }
+}
+
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The whole page tints toward the verdict */
+body[data-state="up"]   { background: radial-gradient(1200px 600px at 50% -10%, var(--up-soft), var(--bg)); }
+body[data-state="down"] { background: radial-gradient(1200px 600px at 50% -10%, var(--down-soft), var(--bg)); }
+body[data-state="degraded"] { background: radial-gradient(1200px 600px at 50% -10%, var(--warn-soft), var(--bg)); }
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 20px 60px;
+}
+
+.topbar { padding: 8px 0 4px; }
+.brand { font-weight: 800; letter-spacing: -0.5px; font-size: 18px; }
+.brand .dot { color: var(--muted); font-weight: 600; }
+
+/* ---------- THE BIG TV ---------- */
+.tv {
+  text-align: center;
+  padding: 28px 16px 24px;
+}
+
+.question {
+  font-size: clamp(16px, 4vw, 20px);
+  color: var(--muted);
+  margin: 8px 0 0;
+}
+
+.verdict {
+  font-size: clamp(72px, 22vw, 160px);
+  line-height: 0.95;
+  margin: 4px 0 8px;
+  font-weight: 900;
+  letter-spacing: -3px;
+}
+body[data-state="up"]   .verdict { color: var(--up); }
+body[data-state="down"] .verdict { color: var(--down); }
+body[data-state="degraded"] .verdict { color: var(--warn); }
+
+.subline {
+  font-size: clamp(15px, 3.5vw, 19px);
+  color: var(--fg);
+  margin: 0 auto 20px;
+  max-width: 480px;
+}
+
+/* ---------- MASCOT ---------- */
+.mascot { line-height: 0; }
+.mascot img {
+  display: block;
+  margin: 0 auto;
+  width: clamp(160px, 42vw, 240px);
+  height: auto;
+  filter: drop-shadow(0 14px 30px rgba(0, 0, 0, .55));
+  transition: filter .3s;
+}
+body[data-state="up"] .mascot img { filter: drop-shadow(0 0 26px rgba(34, 197, 94, .45)); }
+body[data-state="degraded"] .mascot img { filter: drop-shadow(0 0 26px rgba(217, 119, 6, .45)); }
+body[data-state="down"] .mascot img {
+  filter: drop-shadow(0 0 26px rgba(220, 38, 38, .5));
+  animation: glitch 0.9s infinite steps(2);
+}
+
+@keyframes glitch {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-2px, 1px); }
+  50%  { transform: translate(2px, -1px); }
+  75%  { transform: translate(-1px, -1px); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- SMASH BUTTON ---------- */
+.smash {
+  appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transition: transform .05s ease, filter .1s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.smash img {
+  width: clamp(110px, 30vw, 150px);
+  height: auto;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.5));
+  pointer-events: none;
+}
+.smash:hover { filter: brightness(1.08); }
+.smash:active { transform: translateY(4px) scale(.95); }
+/* lit glow that matches the active button color */
+body[data-state="up"]   .smash img { filter: drop-shadow(0 0 18px rgba(132, 204, 22, .65)); }
+body[data-state="down"] .smash img { filter: drop-shadow(0 0 18px rgba(220, 38, 38, .65)); }
+.smash-label {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: .5px;
+  color: var(--fg);
+  text-transform: uppercase;
+}
+.smash.pop { animation: pop .25s ease; }
+@keyframes pop { 50% { transform: scale(1.08); } }
+
+.quote {
+  min-height: 1.4em;
+  margin: 16px auto 6px;
+  max-width: 460px;
+  font-style: italic;
+  color: var(--fg);
+  opacity: 0;
+  transition: opacity .2s;
+}
+.quote.show { opacity: 1; }
+
+.counter { color: var(--muted); font-size: 14px; margin-top: 18px; }
+
+/* ---------- SHARE + SISTER SITE ---------- */
+/* Deliberately quiet: the smash button is the hero, this sits under it. */
+.share {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 18px auto 0;
+  padding: 9px 16px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color .15s ease, border-color .15s ease, background .15s ease;
+}
+.share:hover,
+.share:focus-visible {
+  color: var(--fg);
+  border-color: var(--line-strongest);
+  background: var(--overlay);
+}
+.share .share-icon { font-size: 15px; line-height: 1; }
+/* Nudge toward the verdict colour during an incident — that's when sharing matters. */
+body[data-state="down"] .share { border-color: rgba(220, 38, 38, .45); color: var(--fg); }
+body[data-state="degraded"] .share { border-color: rgba(217, 119, 6, .45); }
+
+.sister {
+  margin: 14px auto 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.sister a { color: var(--muted); text-decoration: underline; text-underline-offset: 2px; }
+.sister a:hover, .sister a:focus-visible { color: var(--fg); }
+
+/* ---------- SPLIT-FLAP ODOMETER ---------- */
+.odometer {
+  display: inline-flex;
+  gap: 2px;
+  vertical-align: middle;
+  perspective: 240px;
+}
+.odometer .cell {
+  display: inline-block;
+  min-width: 0.72em;
+  text-align: center;
+  font-weight: 800;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  color: var(--fg);
+  background: #000;
+  border-radius: 4px;
+  padding: 3px 2px;
+  margin: 0 1px;
+  box-shadow: inset 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0,0,0,.6);
+  /* faux split-flap seam */
+  background-image: linear-gradient(transparent 49%, rgba(0,0,0,.55) 49%, rgba(0,0,0,.55) 51%, transparent 51%);
+  backface-visibility: hidden;
+}
+.odometer .comma {
+  background: none;
+  box-shadow: none;
+  color: var(--muted);
+  min-width: 0.28em;
+  padding: 3px 0;
+}
+.odometer .cell.flipping { animation: flap .26s ease-in-out; }
+@keyframes flap {
+  0%   { transform: rotateX(0deg); }
+  50%  { transform: rotateX(88deg); }
+  100% { transform: rotateX(0deg); }
+}
+
+/* ---------- SECTIONS ---------- */
+.signup, .components {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 22px 0;
+}
+.signup { text-align: center; }
+.signup h2, .components h2 { margin: 0 0 6px; font-size: 20px; }
+.signup p { color: var(--muted); margin: 0 0 16px; }
+
+.finehint { font-size: 12px; color: var(--muted); margin-top: 10px; }
+
+/* ---------- BREVO FORM (dark-theme overrides) ---------- */
+.signup .sib-form { padding: 0; background: transparent !important; }
+.signup .sib-form-container { max-width: 440px; margin: 0 auto; }
+.signup #sib-container {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  max-width: none !important;
+}
+/* email field + button on one row, wrapping on mobile */
+.signup #sib-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  align-items: flex-start;
+}
+.signup .sib-input { flex: 1 1 220px; padding: 0 !important; margin: 0 !important; }
+.signup .form__entry, .signup .entry_block, .signup .form__label-row { margin: 0 !important; padding: 0 !important; }
+.signup .sib-form .input,
+.signup #sib-form input.input {
+  box-sizing: border-box !important;
+  width: 100%;
+  height: 48px !important;
+  padding: 0 14px !important;
+  border-radius: 10px !important;
+  border: 1px solid var(--line-strong) !important;
+  background: var(--bg) !important;
+  color: var(--fg) !important;
+  font-size: 15px !important;
+  font-family: inherit !important;
+  box-shadow: none !important;
+}
+.signup .sib-form .input::placeholder { color: var(--muted) !important; }
+.signup .sib-form-block { padding: 0 !important; }
+.signup .sib-form-block__button {
+  box-sizing: border-box !important;
+  height: 48px !important;
+  padding: 0 22px !important;
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer;
+  background: #84cc16 !important;
+  color: var(--on-bright) !important;
+  font-weight: 800 !important;
+  font-size: 15px !important;
+  font-family: inherit !important;
+  white-space: nowrap;
+  transition: filter .12s ease;
+}
+.signup .sib-form-block__button:hover { filter: brightness(1.08); }
+/* GDPR consent row — full width, sits on its own line below email+button */
+.signup .sib-optin { flex-basis: 100%; padding: 0 !important; margin: 4px 0 0 !important; }
+.signup .entry_mcq { margin: 0 !important; padding: 0 !important; }
+.signup .consent-label {
+  display: flex; align-items: flex-start; gap: 8px;
+  text-align: left; cursor: pointer;
+}
+.signup .consent-label input[type="checkbox"] {
+  width: 16px; height: 16px; margin: 1px 0 0; flex: 0 0 auto;
+  accent-color: #84cc16; cursor: pointer;
+}
+.signup .consent-text { font-size: 12px; color: var(--muted); line-height: 1.45; }
+.signup .consent-text a { color: #84cc16; }
+/* field-level error text */
+.signup .entry__error {
+  flex-basis: 100%;
+  margin-top: 6px !important;
+  padding: 8px 10px !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+}
+/* success / error notification panels */
+.signup .sib-form-message-panel {
+  max-width: 440px !important;
+  margin: 0 auto 14px !important;
+  border-radius: 10px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+}
+
+/* component list */
+#components { list-style: none; margin: 0; padding: 0; }
+#components li {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 4px; border-bottom: 1px solid var(--line); font-size: 15px;
+}
+#components li:last-child { border-bottom: none; }
+.pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; text-transform: capitalize; }
+.pill.operational { background: var(--up-soft); color: #4ade80; }
+.pill.degraded_performance, .pill.partial_outage { background: var(--warn-soft); color: #fbbf24; }
+.pill.major_outage { background: var(--down-soft); color: #f87171; }
+
+/* ---------- LEGAL / CONTENT PAGES ---------- */
+.brand { text-decoration: none; color: var(--fg); }
+.legal { max-width: 720px; }
+.legal h1 { font-size: clamp(28px, 7vw, 40px); margin: 18px 0 4px; }
+.legal h2 { font-size: 19px; margin: 28px 0 6px; }
+.legal p, .legal li { color: var(--fg-soft); line-height: 1.6; font-size: 15px; }
+.legal ul { padding-left: 20px; }
+.legal li { margin: 8px 0; }
+.legal a { color: #fff; }
+.legal-updated { color: var(--muted); font-size: 13px; margin-top: 0; }
+
+/* ---------- CONTEXTUAL BACKUP TOOLS (outage only) ---------- */
+.alternatives {
+  display: none; /* hidden when Claude is up — keeps the calm view clean */
+  background: var(--card);
+  border: 1px solid var(--warn);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 22px 0;
+  text-align: center;
+}
+body[data-state="down"] .alternatives,
+body[data-state="degraded"] .alternatives { display: block; }
+.alternatives h2 { margin: 0 0 6px; font-size: 20px; }
+.alternatives > p { color: var(--muted); margin: 0 auto; max-width: 440px; }
+.alt-list {
+  list-style: none;
+  margin: 16px auto 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+  max-width: 440px;
+}
+.alt-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--bg);
+  border-radius: 10px;
+}
+.alt-list a { color: var(--fg); font-weight: 700; text-decoration: none; }
+.alt-list a:hover { text-decoration: underline; }
+.alt-list span { color: var(--muted); font-size: 13px; }
+.alt-disclaimer { color: var(--muted); font-size: 12px; margin-top: 14px; }
+
+/* ---------- WAITING ROOM (outage only) ---------- */
+/* Same outage gating as .alternatives, but visually quieter: this is a nice-to-have
+   for a blocked reader, not a substitute tool, so it must not out-shout the
+   backup-tools slot above it. */
+.waiting-room {
+  display: none;
+  margin: 22px auto 0;
+  max-width: 440px;
+  text-align: center;
+}
+body[data-state="down"] .waiting-room,
+body[data-state="degraded"] .waiting-room { display: block; }
+.waiting-room h2 { margin: 0 0 4px; font-size: 16px; color: var(--muted); font-weight: 700; }
+.waiting-room > p { color: var(--muted); font-size: 13px; margin: 0 auto 12px; }
+.waiting-room .alt-list { margin-top: 0; }
+.waiting-room .alt-disclaimer a { color: var(--muted); }
+
+/* ---------- COMPANION TOOLS (always visible — pairs WITH Claude, not a substitute) ---------- */
+/* Deliberately separate from .alternatives: these are not outage fallbacks, so they
+   show in the calm "up" view too. Kept quieter than .alternatives so the backup-tools
+   slot stays the credible centrepiece. */
+.companions {
+  margin: 28px auto 0;
+  max-width: 440px;
+  text-align: center;
+}
+.companions h2 { margin: 0 0 4px; font-size: 16px; color: var(--muted); font-weight: 700; }
+.companions > p { color: var(--muted); font-size: 13px; margin: 0 auto 12px; }
+/* reuses .alt-list markup for consistent row styling */
+.companions .alt-list { margin-top: 0; }
+
+/* ---------- FAQ ---------- */
+.faq {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 22px 0;
+}
+.faq h2 { margin: 0 0 8px; font-size: 20px; }
+.faq details { border-bottom: 1px solid var(--line); padding: 14px 0; }
+.faq details:last-child { border-bottom: none; padding-bottom: 0; }
+.faq summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; color: var(--muted); font-weight: 700; font-size: 18px; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 10px 0 2px; }
+
+/* ---------- SUPPORT / DONATE ---------- */
+.support-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin: 22px 0;
+  text-align: center;
+}
+.donate {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  transition: transform .08s ease, filter .15s ease;
+}
+.donate img {
+  width: clamp(130px, 34vw, 170px);
+  height: auto;
+  filter: drop-shadow(0 8px 22px rgba(0, 0, 0, .5));
+}
+.donate:hover { transform: translateY(-3px); }
+.donate:hover img { filter: drop-shadow(0 0 22px rgba(132, 204, 22, .5)); }
+.donate-btn {
+  background: #84cc16;
+  color: var(--on-bright);
+  font-weight: 800;
+  font-size: 16px;
+  padding: 12px 26px;
+  border-radius: 999px;
+  box-shadow: 0 4px 0 #4d7c0f, 0 8px 18px rgba(0,0,0,.4);
+}
+.donate:active .donate-btn { transform: translateY(2px); box-shadow: 0 2px 0 #4d7c0f; }
+.support-copy {
+  color: var(--muted);
+  font-size: 14px;
+  max-width: 420px;
+  margin: 16px auto 0;
+}
+
+/* ---------- OUTAGE HISTORY PAGE (history.html) ---------- */
+/* The history page reuses the shell but is a reading page, not a verdict page:
+   left-aligned, narrower measure, no radial verdict tint. */
+.page-history { background: var(--bg) !important; }
+.page-history .wrap { max-width: 780px; }
+
+.crumbs { font-size: 13px; color: var(--muted); margin: 18px 0 0; }
+.crumbs a { color: var(--muted); }
+.crumbs a:hover, .crumbs a:focus-visible { color: var(--fg); }
+
+.history-intro h1 { font-size: clamp(28px, 7vw, 42px); margin: 10px 0 8px; line-height: 1.1; }
+.history-lede { color: var(--fg-soft); line-height: 1.6; font-size: 16px; margin: 0 0 10px; max-width: 640px; }
+.history-lede a { color: var(--fg); }
+.history-scope { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+.history-cta { font-size: 14px; margin: 0 0 8px; }
+.history-cta a { color: var(--fg); font-weight: 700; }
+
+/* Summary tiles: four numbers that answer "how often / how long" at a glance. */
+.stat-grid {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+.stat-grid li {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stat-value { font-size: 26px; font-weight: 800; color: var(--fg); font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 13px; color: var(--fg-soft); }
+.stat-hint { font-size: 12px; color: var(--muted); }
+
+.history-coverage { color: var(--muted); font-size: 12.5px; line-height: 1.5; margin: 10px 0 0; max-width: 640px; }
+
+.history-list { margin-top: 30px; }
+.history-list h2 { font-size: 20px; margin: 0 0 6px; }
+.incident-month {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--muted);
+  margin: 22px 0 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.incident {
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+.incident-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.incident-name { font-size: 15px; font-weight: 700; margin: 0; color: var(--fg); line-height: 1.4; }
+.incident-meta { font-size: 13px; color: var(--muted); margin: 5px 0 0; }
+.incident-link { font-size: 12px; color: var(--muted); display: inline-block; margin-top: 6px; }
+.incident-link:hover, .incident-link:focus-visible { color: var(--fg); }
+
+/* Statuspage `impact` values, distinct from the component-status pills above. */
+.pill.impact-critical { background: var(--down-soft); color: #f87171; }
+.pill.impact-major { background: var(--down-soft); color: #f87171; }
+.pill.impact-minor { background: var(--warn-soft); color: #fbbf24; }
+.pill.impact-maintenance,
+.pill.impact-none { background: var(--overlay); color: var(--muted); }
+
+.history-empty { color: var(--muted); font-size: 14px; margin: 14px 0; }
+.page-history .faq { margin-top: 34px; }
+
+/* ---------- FOOTER ---------- */
+.foot { color: var(--muted); font-size: 13px; text-align: center; margin-top: 24px; }
+.foot p { margin: 6px 0; }
+.foot a { color: var(--fg); }
+.foot-main { font-size: 14px; color: var(--fg); }
+.foot-network { font-size: 12px; opacity: .78; }
+.foot-legal { font-size: 12px; opacity: .65; }
+
+/* ---------------------------------------------------------------------------
+   Sponsor rails
+   ---------------------------------------------------------------------------
+   Two fixed columns pinned to the bottom corners of the viewport. They use the
+   dead space either side of the 720px content column, so they never push, wrap
+   or overlap anything the reader came for.
+
+   Why fixed-to-bottom rather than sticky-in-a-sidebar: the page has no sidebar
+   to stick to, and the verdict at the top is the whole point of the site — a
+   rail anchored to the top would compete with it. Bottom corners stay visible
+   at any scroll position while reading as chrome, not content.
+
+   Visibility is purely a question of whether there is room, and the breakpoints
+   are set from measured clearance rather than arithmetic. The content column is
+   720px, so a 136px rail + 16px gutter needs (720/2 + 152) = 512px of half-width
+   before it stops touching the text — but a vertical scrollbar eats ~15px of the
+   viewport that `min-width` does not know about. At a literal 1024px the rail
+   measured 7px ON TOP of the content column. The breakpoints below are therefore
+   1100px and 1280px, which leave a real ~30px and ~56px gap once the scrollbar
+   is accounted for. Below that the rails are hidden outright rather than shrunk
+   — a squeezed ad card over a phone-width layout is exactly the intrusion this
+   layout exists to avoid. The footer already carries a Sponsor link.
+--------------------------------------------------------------------------- */
+
+.rail {
+  position: fixed;
+  bottom: 16px;
+  z-index: 40;
+  display: none;              /* opt in per breakpoint below */
+  flex-direction: column;
+  gap: 12px;
+  width: 136px;
+}
+
+.rail--left  { left: 16px; }
+.rail--right { right: 16px; }
+
+.rail-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px;
+  border: 1px solid #2a2f3a;
+  border-radius: 14px;
+  background: var(--card);
+  color: var(--fg);
+  text-decoration: none;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  transition: transform .12s ease, border-color .12s ease;
+}
+
+.rail-card:hover,
+.rail-card:focus-visible {
+  transform: translateY(-2px);
+  border-color: #3d4452;
+}
+
+.rail-card:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+/* The "this space is available" variant. Dashed, so it reads as an offer rather
+   than as a real placement someone paid for. */
+.rail-card--offer { border-style: dashed; border-color: #39404e; }
+
+.rail-label {
+  position: absolute;
+  top: 5px;
+  right: 9px;
+  font-size: 7px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.rail-mark {
+  flex: 0 0 30px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #232833;
+  font-size: 15px;
+  overflow: hidden;
+}
+
+.rail-card--offer .rail-mark {
+  border-radius: 50%;
+  background: var(--warn);
+  color: #1a1200;
+  font-weight: 800;
+}
+
+.rail-mark img { width: 100%; height: 100%; object-fit: contain; }
+
+.rail-copy { min-width: 0; }
+
+.rail-copy strong {
+  display: block;
+  font-size: 12px;
+  line-height: 1.15;
+  /* Long sponsor names must not blow the rail out or spill over the card. */
+  overflow-wrap: anywhere;
+}
+
+/* The blurb is the first thing to go when space is tight — the name and the
+   fact that it is clickable carry the placement on their own. */
+.rail-copy span {
+  display: none;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--muted);
+}
+
+@media (min-width: 1100px) and (min-height: 600px) {
+  .rail { display: flex; }
+}
+
+@media (min-width: 1280px) and (min-height: 600px) {
+  .rail { width: 200px; gap: 14px; }
+  .rail-card { padding: 12px; gap: 10px; }
+  .rail-copy strong { font-size: 13px; }
+  .rail-copy span { display: block; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rail-card { transition: none; }
+  .rail-card:hover, .rail-card:focus-visible { transform: none; }
+}

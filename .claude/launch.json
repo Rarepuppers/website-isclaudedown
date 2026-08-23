@@ -1,0 +1,6 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    { "name": "isclaudedown", "runtimeExecutable": "npx", "runtimeArgs": ["-y","http-server","-p","4188","-c-1"], "port": 4188 }
+  ]
+}
