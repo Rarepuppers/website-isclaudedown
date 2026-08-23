@@ -211,7 +211,11 @@
         <img id="mascot-img" src="assets/robot-up.webp" alt="Claude status robot" width="220" height="220" />
       </div>
 
-      <p class="question">Is Claude up?</p>
+      <!-- MUST match the polarity of config.js copy.*.verdict. This domain asks
+           "down", so the answers are NO when Claude is up and YES when it is
+           down. Ask "up" here and the page reads "Is Claude up? NO" while
+           Claude is working -- i.e. it tells people it is broken. -->
+      <p class="question">Is Claude down?</p>
       <h1 class="verdict" id="verdict">…</h1>
       <p class="subline" id="subline">Checking the official status page…</p>
 
